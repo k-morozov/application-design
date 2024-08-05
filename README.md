@@ -60,3 +60,8 @@ curl --location --request POST 'localhost:8080/orders' \
     "to": "2024-01-04T00:00:00Z"
 }'
 ```
+
+```sh
+curl --location --request GET 'localhost:8080/ping' \
+--header 'Content-Type: application/json'
+```
