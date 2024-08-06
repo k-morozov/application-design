@@ -2,21 +2,35 @@ package config
 
 import (
 	"flag"
+	"time"
 )
 
 const (
-	DefaultPort     = "8080"
-	DefaultLogLevel = "debug"
+	DefaultPort          = "8080"
+	DefaultLogLevel      = "debug"
+	DefaultHandleTimeout = 2 * time.Minute
 )
 
+const (
+	InMemory StorageType = iota
+	LocalFile
+	Database
+)
+
+type StorageType int
+
 type ServiceConfig struct {
-	Port     string
-	LogLevel string
-	UseHTTPS bool
+	Port          string
+	LogLevel      string
+	UseHTTPS      bool
+	StorageType   StorageType
+	HandleTimeout time.Duration
 }
 
 func ParseConfig() ServiceConfig {
-	config := ServiceConfig{}
+	config := ServiceConfig{
+		HandleTimeout: DefaultHandleTimeout,
+	}
 
 	flag.StringVar(&config.LogLevel, "l", DefaultLogLevel, "")
 	flag.StringVar(&config.Port, "p", DefaultPort, "")
@@ -26,6 +40,12 @@ func ParseConfig() ServiceConfig {
 }
 
 func NewServiceConfigForDebug() ServiceConfig {
-	config := ServiceConfig{}
+	config := ServiceConfig{
+		HandleTimeout: DefaultHandleTimeout,
+	}
 	return config
+}
+
+func (c ServiceConfig) IsMemoryStorage() bool {
+	return c.StorageType == InMemory
 }

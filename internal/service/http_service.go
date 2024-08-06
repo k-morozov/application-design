@@ -3,6 +3,7 @@ package service
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/handlers"
+	"applicationDesign/internal/storage"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -15,14 +16,22 @@ type (
 	ServiceHTTP       struct {
 		server *http.Server
 		engine *chi.Mux
+		store  storage.Storage
 		config config.ServiceConfig
 		log    zerolog.Logger
 	}
 )
 
 func NewServiceHTTP(lg zerolog.Logger, cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
+	store, err := storage.NewStorage(lg, cfg)
+	if err != nil {
+		lg.Err(err).Msg("failed create store")
+		return nil, err
+	}
+
 	srv := &ServiceHTTP{
 		engine: chi.NewRouter(),
+		store:  store,
 		config: cfg,
 	}
 
@@ -35,6 +44,7 @@ func NewServiceHTTP(lg zerolog.Logger, cfg config.ServiceConfig, opts ...Service
 
 func (s *ServiceHTTP) ListenAndServe() error {
 	s.engine.Get("/ping", s.Ping)
+	s.engine.Post("/orders", s.Orders)
 
 	log.Info().
 		Str("port", s.config.Port).
@@ -55,5 +65,9 @@ func (s *ServiceHTTP) ListenAndServe() error {
 }
 
 func (s *ServiceHTTP) Ping(rw http.ResponseWriter, req *http.Request) {
-	handlers.Ping(rw, req)
+	handlers.Ping(rw, req, s.store)
+}
+
+func (s *ServiceHTTP) Orders(rw http.ResponseWriter, req *http.Request) {
+	handlers.Orders(rw, req, s.store, s.config)
 }
