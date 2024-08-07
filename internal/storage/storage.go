@@ -2,6 +2,7 @@ package storage
 
 import (
 	"applicationDesign/internal/config"
+	"applicationDesign/internal/models"
 	"context"
 	"fmt"
 
@@ -10,7 +11,7 @@ import (
 
 type Storage interface {
 	Ping() error
-	Orders(ctx context.Context) error
+	Orders(ctx context.Context, order *models.Order) error
 }
 
 func newSyncMemoryStorage(lg zerolog.Logger) (Storage, error) {

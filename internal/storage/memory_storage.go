@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"applicationDesign/internal/models"
 	"context"
 
 	"github.com/rs/zerolog"
@@ -26,6 +27,7 @@ func (s *MemoryStorage) Ping() error {
 	return nil
 }
 
-func (s *MemoryStorage) Orders(ctx context.Context) error {
+func (s *MemoryStorage) Orders(ctx context.Context, order *models.Order) error {
+	// booking
 	return nil
 }

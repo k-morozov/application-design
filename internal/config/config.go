@@ -41,6 +41,7 @@ func ParseConfig() ServiceConfig {
 
 func NewServiceConfigForDebug() ServiceConfig {
 	config := ServiceConfig{
+		LogLevel:      DefaultLogLevel,
 		HandleTimeout: DefaultHandleTimeout,
 	}
 	return config
