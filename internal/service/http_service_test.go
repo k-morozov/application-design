@@ -107,7 +107,7 @@ func TestSimpleServiceWork(t *testing.T) {
 				"hotel_id": "reddison",
 				"room_id": "lux",
 				"email": "guest@mail.ru",
-				"from": "2024-01-02T00:00:00Z",
+				"from": "2024-01-02T00:00:00Z"
 			}`)),
 			response: &http.Response{
 				Status:        "400 Bad Request",

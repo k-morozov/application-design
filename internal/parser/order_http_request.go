@@ -16,16 +16,6 @@ func ParseBodyOrderRequest(req *http.Request, lg zerolog.Logger) (*models.Order,
 	// 	return nil, errors.New("broken body")
 	// }
 
-	dec := json.NewDecoder(req.Body)
-	dec.DisallowUnknownFields()
-
-	bodyRequest := models.Order{}
-
-	if err := dec.Decode(&bodyRequest); err != nil {
-		lg.Error().Err(err).Msg("failed parse body request")
-		return nil, errors.New("broken body")
-	}
-
 	// if !json.Valid(rawRequestBody) {
 	// 	lg.Error().Err(err).Msg("failed convert body to json")
 	// 	return nil, errors.New("broken body")
@@ -41,6 +31,16 @@ func ParseBodyOrderRequest(req *http.Request, lg zerolog.Logger) (*models.Order,
 	// lg.Debug().
 	// 	Any("bodyRequest", bodyRequest).
 	// 	Msg("unmarshal")
+
+	dec := json.NewDecoder(req.Body)
+	dec.DisallowUnknownFields()
+
+	bodyRequest := models.Order{}
+
+	if err := dec.Decode(&bodyRequest); err != nil {
+		lg.Error().Err(err).Msg("failed parse body request")
+		return nil, errors.New("broken body")
+	}
 
 	if !bodyRequest.Validate() {
 		lg.Error().Msg("failed validate")
