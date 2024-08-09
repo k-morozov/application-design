@@ -34,6 +34,8 @@ func (s *MemoryStorage) Orders(ctx context.Context, order *models.Order) error {
 	var booking_id logic.BookingID
 	var err error
 
+	s.lg.Info().Msg("MemoryStorage: call Orders")
+
 	if booking_id, err = s.manager.PrepareBook(order); err != nil {
 		s.lg.Error().Msg("failed prepared booking")
 		return err

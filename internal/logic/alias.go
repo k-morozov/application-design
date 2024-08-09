@@ -9,3 +9,7 @@ type BookingID uuid.UUID
 func (id BookingID) String() string {
 	return uuid.UUID(id).String()
 }
+
+func NewBookingID() BookingID {
+	return BookingID(uuid.New())
+}
