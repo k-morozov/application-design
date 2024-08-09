@@ -2,23 +2,22 @@ package logic
 
 import (
 	"applicationDesign/internal/models"
-
 	"github.com/rs/zerolog"
 )
 
 type BookingManager struct {
-	lg                  zerolog.Logger
-	book_queue          BookQueue
-	guest_house_manager GuestHouseManager
+	lg                zerolog.Logger
+	bookQueue         BookQueue
+	guestHouseManager GuestHouseManager
 }
 
 var _ Manager = &BookingManager{}
 
-func NewBookingManager(lg zerolog.Logger) Manager {
+func NewBookingManager(lg zerolog.Logger, workers int) Manager {
 	p := &BookingManager{
-		lg:                  lg.With().Caller().Logger(),
-		book_queue:          newMemoryBookQueue(lg),
-		guest_house_manager: newHotel(),
+		lg:                lg.With().Caller().Logger(),
+		bookQueue:         newMemoryBookQueue(lg, workers),
+		guestHouseManager: newHotel(),
 	}
 
 	return p
@@ -27,10 +26,11 @@ func NewBookingManager(lg zerolog.Logger) Manager {
 func (m *BookingManager) PrepareBook(order *models.Order) (BookingID, error) {
 	m.lg.Info().Msg("BookingManager: call PrepareBook")
 
-	out := m.book_queue.Add(order)
+	internalOrder := transform(order)
+	m.bookQueue.Add(internalOrder)
 
-	m.lg.Info().Msg("BookingManager: wait result")
-	result := <-out
+	m.lg.Info().Msg("BookingManager: wait resultCh")
+	result := <-internalOrder.resultCh
 	if result.err != nil {
 		m.lg.Error().Err(result.err).Msg("Failed prepare book")
 		return BookingID{}, result.err

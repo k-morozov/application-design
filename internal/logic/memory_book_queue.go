@@ -1,51 +1,57 @@
 package logic
 
 import (
-	"applicationDesign/internal/models"
-
 	"github.com/rs/zerolog"
+	"sync"
 )
 
 type MemoryBookQueue struct {
-	lg           zerolog.Logger
-	orders_queue chan InternalOrder
-	// stop workers
+	lg          zerolog.Logger
+	ordersQueue chan *InternalOrder
+	wg          sync.WaitGroup
 }
 
 var _ BookQueue = &MemoryBookQueue{}
 
-func newMemoryBookQueue(lg zerolog.Logger) BookQueue {
+func newMemoryBookQueue(lg zerolog.Logger, workers int) BookQueue {
 	result := &MemoryBookQueue{
-		lg:           lg,
-		orders_queue: make(chan InternalOrder),
+		lg:          lg,
+		ordersQueue: make(chan *InternalOrder),
 	}
-	for w := 0; w < 2; w++ {
+	for w := 0; w < workers; w++ {
 		result.lg.Debug().Msg("Add worker queue")
-		go worker(result.orders_queue)
+		result.wg.Add(1)
+		go result.worker()
 	}
 	return result
 }
 
-func (q *MemoryBookQueue) Add(order *models.Order) <-chan ResultPrepareBook {
-	q.lg.Debug().Msg("Add order")
+func (q *MemoryBookQueue) Add(order *InternalOrder) {
+	q.lg.Info().Msg("Add: start")
 
-	result_channel := make(chan ResultPrepareBook)
-	internal_order := InternalOrder{
-		result: result_channel,
-		order:  order,
-	}
+	q.ordersQueue <- order
 
-	q.orders_queue <- internal_order
-
-	return result_channel
+	q.lg.Info().Msg("Add: finish")
 }
 
-func worker(orders <-chan InternalOrder) {
-	for order := range orders {
+func (q *MemoryBookQueue) Stop() {
+	q.lg.Debug().Msg("Stop queue")
+	close(q.ordersQueue)
+
+	q.lg.Debug().Msg("Wait close worker")
+	q.wg.Wait()
+}
+
+func (q *MemoryBookQueue) worker() {
+	for order := range q.ordersQueue {
+		q.lg.Debug().Msg("worker has an order.")
 		result := ResultPrepareBook{
 			err: nil,
 			id:  NewBookingID(),
 		}
-		order.result <- result
+		order.resultCh <- result
+		q.lg.Debug().Msg("worker send result in channel.")
 	}
+	q.lg.Debug().Msg("worker has done.")
+	q.wg.Done()
 }

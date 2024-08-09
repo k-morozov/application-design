@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"applicationDesign/internal/config"
 	"applicationDesign/internal/logic"
 	"applicationDesign/internal/models"
 	"context"
@@ -11,14 +12,16 @@ import (
 type MemoryStorage struct {
 	manager logic.Manager
 	lg      zerolog.Logger
+	cfg     config.ServiceConfig
 }
 
 var _ Storage = &MemoryStorage{}
 
-func newMemoryStorage(lg zerolog.Logger) (Storage, error) {
+func newMemoryStorage(lg zerolog.Logger, cfg config.ServiceConfig) (Storage, error) {
 	storage := &MemoryStorage{
-		manager: logic.NewBookingManager(lg),
+		manager: logic.NewBookingManager(lg, cfg.Workers),
 		lg:      lg.With().Caller().Logger(),
+		cfg:     cfg,
 	}
 
 	storage.lg.Info().Msg("Memory storage created")

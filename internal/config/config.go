@@ -9,6 +9,7 @@ const (
 	DefaultPort          = "8080"
 	DefaultLogLevel      = "debug"
 	DefaultHandleTimeout = 2 * time.Minute
+	DefaultWorkers       = 4
 )
 
 const (
@@ -25,11 +26,13 @@ type ServiceConfig struct {
 	UseHTTPS      bool
 	StorageType   StorageType
 	HandleTimeout time.Duration
+	Workers       int
 }
 
 func ParseConfig() ServiceConfig {
 	config := ServiceConfig{
 		HandleTimeout: DefaultHandleTimeout,
+		Workers:       DefaultWorkers,
 	}
 
 	flag.StringVar(&config.LogLevel, "l", DefaultLogLevel, "")
@@ -43,6 +46,7 @@ func NewServiceConfigForDebug() ServiceConfig {
 	config := ServiceConfig{
 		LogLevel:      DefaultLogLevel,
 		HandleTimeout: DefaultHandleTimeout,
+		Workers:       DefaultWorkers,
 	}
 	return config
 }
