@@ -2,6 +2,7 @@ package storage
 
 import (
 	"applicationDesign/internal/config"
+	"applicationDesign/internal/logic/guest_house"
 	"applicationDesign/internal/models"
 	"context"
 	"fmt"
@@ -14,10 +15,10 @@ type Storage interface {
 	Orders(ctx context.Context, order *models.Order) error
 }
 
-func NewStorage(lg zerolog.Logger, cfg config.ServiceConfig) (Storage, error) {
+func NewStorage(guestHouseManager guest_house.GuestHouseManager, cfg config.ServiceConfig, lg zerolog.Logger) (Storage, error) {
 	if cfg.IsMemoryStorage() {
 		lg.Info().Msg("create db storage")
-		return newMemoryStorage(lg, cfg)
+		return newMemoryStorage(guestHouseManager, lg, cfg)
 	}
 
 	return nil, fmt.Errorf("doesn't support this storage type: %d", cfg.StorageType)

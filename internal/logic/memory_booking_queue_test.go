@@ -2,6 +2,7 @@ package logic
 
 import (
 	"applicationDesign/internal/log"
+	"applicationDesign/internal/logic/guest_house"
 	"applicationDesign/internal/models"
 	"testing"
 	"time"
@@ -54,28 +55,29 @@ func TestMemoryBookingQueue(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			q := newMemoryBookQueue(lg, 2)
+			g := guest_house.NewGuestHouseManager()
+			q := newMemoryBookQueue(g, lg, 2)
 
-			var results []chan ResultPrepareBook
+			var results []chan error
 
 			for _, order := range test.orders {
 				internalOrder := transform(&order)
-				q.Add(internalOrder)
-				results = append(results, internalOrder.resultCh)
+				_ = q.Add(internalOrder)
+				results = append(results, internalOrder.ResultCh)
 			}
 
 			for _, resultCh := range results {
 				lg.Info().Msg("wait result")
-				result := <-resultCh
+				err := <-resultCh
 				lg.Info().Msg("result ready")
 
 				close(resultCh)
 
-				assert.Equal(t, nil, result.err)
-				assert.NotEqual(t, "", result.id.String())
+				assert.Equal(t, nil, err)
+				//assert.NotEqual(t, "", result.bookingID.String())
 			}
 
-			q.Stop()
+			_ = q.Stop()
 
 		})
 	}

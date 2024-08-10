@@ -1,11 +1,9 @@
 package logic
 
-type ResultPrepareBook struct {
-	err error
-	id  BookingID
-}
+import "applicationDesign/internal/logic/guest_house"
 
 type BookQueue interface {
-	Add(order *InternalOrder)
-	Stop()
+	Add(order *guest_house.HotelOrder) error
+	Stop() error
+	Worker()
 }

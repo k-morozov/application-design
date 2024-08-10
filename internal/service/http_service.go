@@ -3,6 +3,7 @@ package service
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/handlers"
+	"applicationDesign/internal/logic/guest_house"
 	"applicationDesign/internal/storage"
 	"net/http"
 
@@ -23,7 +24,9 @@ type (
 )
 
 func NewServiceHTTP(lg zerolog.Logger, cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
-	store, err := storage.NewStorage(lg, cfg)
+	guestHouseManager := guest_house.NewGuestHouseManager()
+
+	store, err := storage.NewStorage(guestHouseManager, cfg, lg)
 	if err != nil {
 		lg.Err(err).Msg("failed create store")
 		return nil, err
