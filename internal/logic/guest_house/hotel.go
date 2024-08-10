@@ -11,22 +11,12 @@ const (
 	RoomFree RoomStatus = iota
 	RoomReserve
 	RoomBusy
-	RoomLock
 )
 
 type HotelID string
 
 func (id HotelID) String() string {
 	return string(id)
-}
-
-type RoomID string
-
-type RoomStatus int
-
-type Room struct {
-	RoomID RoomID
-	Status RoomStatus
 }
 
 type Hotel struct {
@@ -40,10 +30,8 @@ func (h *Hotel) AddRoom(roomID RoomID) {
 	h.roomsMutex.Lock()
 	defer h.roomsMutex.Unlock()
 
-	h.Rooms[roomID] = &Room{
-		RoomID: roomID,
-		Status: RoomFree,
-	}
+	r := NewRoom(roomID)
+	h.Rooms[roomID] = &r
 }
 
 func NewHotel(hotelID HotelID, lg zerolog.Logger) Hotel {
@@ -54,7 +42,7 @@ func NewHotel(hotelID HotelID, lg zerolog.Logger) Hotel {
 	}
 }
 
-func (h *Hotel) ReserveRoom(roomID RoomID) error {
+func (h *Hotel) ReserveRoom(roomID RoomID, interval RoomInterval) error {
 	h.roomsMutex.Lock()
 	defer h.roomsMutex.Unlock()
 
@@ -64,11 +52,15 @@ func (h *Hotel) ReserveRoom(roomID RoomID) error {
 
 	h.lg.Info().Str("room_id", string(roomID)).Any("rooms", h.Rooms).Msg("Status all rooms in hotel")
 
-	if h.Rooms[roomID].Status != RoomFree {
-		return fmt.Errorf("room with id=%v is not free: %v, should be %v", roomID, h.Rooms[roomID].Status, RoomFree)
+	//if h.Rooms[roomID].Status != RoomFree {
+	//	return fmt.Errorf("room with id=%v is not free: %v, should be %v", roomID, h.Rooms[roomID].Status, RoomFree)
+	//}
+
+	if !h.Rooms[roomID].ReserveByInterval(interval) {
+		return fmt.Errorf("room with id=%v has already been reserved", roomID)
 	}
 
-	h.Rooms[roomID].Status = RoomReserve
+	//h.Rooms[roomID].Status = RoomReserve
 
 	return nil
 }

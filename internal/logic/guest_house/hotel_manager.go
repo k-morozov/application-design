@@ -39,7 +39,7 @@ func (h *HotelManager) PrepareBook(order models.Order) error {
 	}
 
 	h.lg.Info().Str("room_id", order.RoomID).Msg("start reserve room in hotel")
-	if err := hotel.ReserveRoom(RoomID(order.RoomID)); err != nil {
+	if err := hotel.ReserveRoom(RoomID(order.RoomID), RoomInterval{From: order.From, To: order.To}); err != nil {
 		return err
 	}
 	h.lg.Info().Str("room_id", order.RoomID).Msg("room is reserved in hotel")
