@@ -4,6 +4,7 @@ import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/log"
 	"applicationDesign/internal/service"
+	"errors"
 	"net/http"
 )
 
@@ -22,7 +23,7 @@ func Run() {
 		lg.Error().Msg(err.Error())
 		return
 	}
-	if err = srv.ListenAndServe(); err != http.ErrServerClosed {
+	if err = srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		lg.Error().Err(err)
 	}
 }

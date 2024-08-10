@@ -2,6 +2,7 @@ package logic
 
 import (
 	"applicationDesign/internal/log"
+	"applicationDesign/internal/logic/guest_house"
 	"applicationDesign/internal/models"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ func TestMemoryBookingQueue(t *testing.T) {
 	// lg := zerolog.Nop()
 	lg := log.NewLogger("debug")
 
+	HotelID := guest_house.HotelID("hotel1")
 	tests := []struct {
 		name   string
 		orders []models.Order
@@ -21,28 +23,28 @@ func TestMemoryBookingQueue(t *testing.T) {
 			name: "simple",
 			orders: []models.Order{
 				{
-					HotelID:   "hotel1",
+					HotelID:   HotelID.String(),
 					RoomID:    "room1",
 					UserEmail: "a@a",
 					From:      time.Time{},
 					To:        time.Time{},
 				},
 				{
-					HotelID:   "hotel1",
+					HotelID:   HotelID.String(),
 					RoomID:    "room2",
-					UserEmail: "a@a",
+					UserEmail: "b@b",
 					From:      time.Time{},
 					To:        time.Time{},
 				},
 				{
-					HotelID:   "hotel1",
+					HotelID:   HotelID.String(),
 					RoomID:    "room3",
-					UserEmail: "a@a",
+					UserEmail: "c@c",
 					From:      time.Time{},
 					To:        time.Time{},
 				},
 				{
-					HotelID:   "hotel1",
+					HotelID:   HotelID.String(),
 					RoomID:    "room4",
 					UserEmail: "a@a",
 					From:      time.Time{},
@@ -54,28 +56,35 @@ func TestMemoryBookingQueue(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			q := newMemoryBookQueue(lg, 2)
+			g := guest_house.NewGuestHouseManager(lg)
 
-			var results []chan ResultPrepareBook
+			hotel := guest_house.NewHotel(HotelID, lg)
+			for _, order := range test.orders {
+				hotel.AddRoom(guest_house.RoomID(order.RoomID))
+			}
+
+			g.AddGuestHouse(&hotel)
+
+			q := newMemoryBookQueue(g, lg, 2)
+
+			var results []chan error
 
 			for _, order := range test.orders {
-				internalOrder := transform(&order)
-				q.Add(internalOrder)
-				results = append(results, internalOrder.resultCh)
+				internalOrder := transform(order)
+				_ = q.Add(internalOrder)
+				results = append(results, internalOrder.ResultCh)
 			}
 
 			for _, resultCh := range results {
-				lg.Info().Msg("wait result")
-				result := <-resultCh
-				lg.Info().Msg("result ready")
+				err := <-resultCh
 
 				close(resultCh)
 
-				assert.Equal(t, nil, result.err)
-				assert.NotEqual(t, "", result.id.String())
+				assert.Equal(t, nil, err)
+				//assert.NotEqual(t, "", result.bookingID.String())
 			}
 
-			q.Stop()
+			_ = q.Stop()
 
 		})
 	}

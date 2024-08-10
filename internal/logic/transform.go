@@ -1,10 +1,13 @@
 package logic
 
-import "applicationDesign/internal/models"
+import (
+	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/models"
+)
 
-func transform(order *models.Order) *InternalOrder {
-	return &InternalOrder{
-		resultCh: make(chan ResultPrepareBook, 1),
-		order:    order,
+func transform(order models.Order) guest_house.HotelOrder {
+	return guest_house.HotelOrder{
+		ResultCh: make(chan error, 1),
+		Order:    order,
 	}
 }
