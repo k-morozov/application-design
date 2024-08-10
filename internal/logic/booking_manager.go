@@ -11,7 +11,7 @@ type BookingManager struct {
 	lg          zerolog.Logger
 	bookQueue   BookQueue
 	ordersMutex sync.Mutex
-	orders      map[BookingID]*models.Order
+	orders      map[BookingID]models.Order
 }
 
 var _ Manager = &BookingManager{}
@@ -20,13 +20,13 @@ func NewBookingManager(guestHouseManager guest_house.GuestHouseManager, workers 
 	p := &BookingManager{
 		lg:        lg.With().Caller().Logger(),
 		bookQueue: newMemoryBookQueue(guestHouseManager, lg, workers),
-		orders:    make(map[BookingID]*models.Order),
+		orders:    make(map[BookingID]models.Order),
 	}
 
 	return p
 }
 
-func (m *BookingManager) PrepareBook(order *models.Order) (BookingID, error) {
+func (m *BookingManager) PrepareBook(order models.Order) (BookingID, error) {
 	m.lg.Info().Msg("BookingManager: call PrepareBook")
 
 	internalOrder := transform(order)
@@ -57,7 +57,7 @@ func (m *BookingManager) AcceptBook(bookingID BookingID) error {
 	return nil
 }
 
-func (m *BookingManager) SaveOrder(order *models.Order) (BookingID, error) {
+func (m *BookingManager) SaveOrder(order models.Order) (BookingID, error) {
 	bookingID := NewBookingID()
 	m.ordersMutex.Lock()
 	defer m.ordersMutex.Unlock()

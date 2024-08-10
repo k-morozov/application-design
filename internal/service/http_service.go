@@ -24,7 +24,7 @@ type (
 )
 
 func NewServiceHTTP(lg zerolog.Logger, cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
-	guestHouseManager := guest_house.NewGuestHouseManager()
+	guestHouseManager := guest_house.NewGuestHouseManager(lg)
 
 	store, err := storage.NewStorage(guestHouseManager, cfg, lg)
 	if err != nil {

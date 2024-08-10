@@ -10,5 +10,5 @@ type ResultPrepareBook struct {
 
 type HotelOrder struct {
 	ResultCh chan error
-	Order    *models.Order
+	Order    models.Order
 }

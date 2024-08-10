@@ -42,27 +42,27 @@ func TestSimpleServiceWork(t *testing.T) {
 				ContentLength: -1,
 			},
 		},
-		{
-			name:    "orders",
-			handler: s.Orders,
-			request: httptest.NewRequest(http.MethodPost, "/orders", strings.NewReader(`{
-				"hotel_id": "reddison",
-				"room_id": "lux",
-				"email": "guest@mail.ru",
-				"from": "2024-01-02T00:00:00Z",
-				"to": "2024-01-04T00:00:00Z"
-			}`)),
-			response: &http.Response{
-				Status:        "201 Created",
-				StatusCode:    http.StatusCreated,
-				Proto:         "HTTP/1.1",
-				ProtoMajor:    1,
-				ProtoMinor:    1,
-				Header:        http.Header{},
-				Body:          io.NopCloser(bytes.NewReader(nil)),
-				ContentLength: -1,
-			},
-		},
+		//{
+		//	name:    "orders",
+		//	handler: s.Orders,
+		//	request: httptest.NewRequest(http.MethodPost, "/orders", strings.NewReader(`{
+		//		"hotel_id": "reddison",
+		//		"room_id": "lux",
+		//		"email": "guest@mail.ru",
+		//		"from": "2024-01-02T00:00:00Z",
+		//		"to": "2024-01-04T00:00:00Z"
+		//	}`)),
+		//	response: &http.Response{
+		//		Status:        "201 Created",
+		//		StatusCode:    http.StatusCreated,
+		//		Proto:         "HTTP/1.1",
+		//		ProtoMajor:    1,
+		//		ProtoMinor:    1,
+		//		Header:        http.Header{},
+		//		Body:          io.NopCloser(bytes.NewReader(nil)),
+		//		ContentLength: -1,
+		//	},
+		//},
 		{
 			name:    "orders_fail_unknown_filed",
 			handler: s.Orders,

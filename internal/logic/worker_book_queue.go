@@ -9,7 +9,7 @@ import (
 type WorkerBookQueue struct {
 	guestHouseManager guest_house.GuestHouseManager
 	lg                zerolog.Logger
-	ordersQueue       chan *guest_house.HotelOrder
+	ordersQueue       chan guest_house.HotelOrder
 	wg                sync.WaitGroup
 }
 
@@ -19,7 +19,7 @@ func newMemoryBookQueue(guestHouseManager guest_house.GuestHouseManager, lg zero
 	result := &WorkerBookQueue{
 		guestHouseManager: guestHouseManager,
 		lg:                lg,
-		ordersQueue:       make(chan *guest_house.HotelOrder),
+		ordersQueue:       make(chan guest_house.HotelOrder),
 	}
 	for w := 0; w < workers; w++ {
 		result.lg.Debug().Msg("Add worker queue")
@@ -29,14 +29,11 @@ func newMemoryBookQueue(guestHouseManager guest_house.GuestHouseManager, lg zero
 	return result
 }
 
-func (q *WorkerBookQueue) Add(order *guest_house.HotelOrder) error {
-	q.lg.Info().Msg("Add: start")
+func (q *WorkerBookQueue) Add(order guest_house.HotelOrder) error {
+	q.lg.Info().Any("order", order.Order).Msg("add order to booking queue")
 
 	// @todo if channel is close?
 	q.ordersQueue <- order
-
-	q.lg.Info().Msg("Add: finish")
-
 	return nil
 }
 
@@ -52,12 +49,12 @@ func (q *WorkerBookQueue) Stop() error {
 
 func (q *WorkerBookQueue) Worker() {
 	for order := range q.ordersQueue {
-		q.lg.Debug().Msg("worker has an order.")
+		//q.lg.Debug().Any("order", order.Order).Msg("worker gets order from booking queue.")
 
-		result := q.guestHouseManager.PrepareBook(order)
+		result := q.guestHouseManager.PrepareBook(order.Order)
 		order.ResultCh <- result
 
-		q.lg.Debug().Msg("worker send result in channel.")
+		//q.lg.Debug().Msg("worker send result in channel.")
 	}
 	q.lg.Debug().Msg("worker has done.")
 	q.wg.Done()
