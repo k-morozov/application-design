@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/logic/hotel/manager"
 	"applicationDesign/internal/models"
 	"github.com/rs/zerolog"
 	"sync"
@@ -9,17 +9,17 @@ import (
 
 type BookingManager struct {
 	lg          zerolog.Logger
-	bookQueue   BookQueue
+	bookQueue   BaseBookingQueue
 	ordersMutex sync.Mutex
 	orders      map[BookingID]models.Order
 }
 
-var _ Manager = &BookingManager{}
+var _ BaseBookingManager = &BookingManager{}
 
-func NewBookingManager(guestHouseManager guest_house.GuestHouseManager, workers int, lg zerolog.Logger) Manager {
+func NewBookingManager(guestHouseManager manager.BaseHotelManager, workers int, lg zerolog.Logger) BaseBookingManager {
 	p := &BookingManager{
 		lg:        lg.With().Caller().Logger(),
-		bookQueue: newMemoryBookQueue(guestHouseManager, lg, workers),
+		bookQueue: newInMemoryBookingQueue(guestHouseManager, lg, workers),
 		orders:    make(map[BookingID]models.Order),
 	}
 

@@ -1,7 +1,9 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/logic/hotel"
+	"applicationDesign/internal/logic/hotel/accommodation"
+	"applicationDesign/internal/logic/hotel/manager"
 	"applicationDesign/internal/models"
 	"applicationDesign/internal/utils"
 	"github.com/rs/zerolog"
@@ -13,7 +15,7 @@ func TestSimpleBook(t *testing.T) {
 	lg := zerolog.Nop()
 	//lg := log.NewLogger("debug")
 
-	HotelID := guest_house.HotelID("hotel1")
+	HotelID := hotel.HotelID("hotel1")
 	tests := []struct {
 		name   string
 		orders []models.Order
@@ -55,16 +57,16 @@ func TestSimpleBook(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := guest_house.NewGuestHouseManager(lg)
+			g := manager.NewGuestHouseManager(lg)
 
-			hotel := guest_house.NewHotel(HotelID, lg)
+			testHotel := hotel.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
-				hotel.AddRoom(guest_house.RoomID(order.RoomID))
+				testHotel.AddRoom(accommodation.AccommodationID(order.RoomID))
 			}
 
-			g.AddGuestHouse(&hotel)
+			g.AddHotel(&testHotel)
 
-			q := newMemoryBookQueue(g, lg, 2)
+			q := newInMemoryBookingQueue(g, lg, 2)
 
 			var results []chan error
 
@@ -84,13 +86,13 @@ func TestSimpleBook(t *testing.T) {
 
 			_ = q.Stop()
 
-			assert.Equal(t, len(test.orders), len(hotel.Rooms))
+			assert.Equal(t, len(test.orders), len(testHotel.Rooms))
 			for _, order := range test.orders {
-				room, ok := hotel.Rooms[guest_house.RoomID(order.RoomID)]
+				room, ok := testHotel.Rooms[accommodation.AccommodationID(order.RoomID)]
 
 				assert.True(t, ok)
 
-				assert.Equal(t, room.FreeRoomIntervals, []guest_house.RoomInterval{
+				assert.Equal(t, room.FreeRoomIntervals, []accommodation.IntervalAccommodation{
 					{
 						From: utils.Date(2030, 1, 1),
 						To:   utils.Date(2030, 1, 11),
@@ -109,7 +111,7 @@ func TestBookOneRoom(t *testing.T) {
 	lg := zerolog.Nop()
 	//lg := log.NewLogger("debug")
 
-	HotelID := guest_house.HotelID("hotel1")
+	HotelID := hotel.HotelID("hotel1")
 	tests := []struct {
 		name   string
 		orders []models.Order
@@ -137,16 +139,16 @@ func TestBookOneRoom(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := guest_house.NewGuestHouseManager(lg)
+			g := manager.NewGuestHouseManager(lg)
 
-			hotel := guest_house.NewHotel(HotelID, lg)
+			testHotel := hotel.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
-				hotel.AddRoom(guest_house.RoomID(order.RoomID))
+				testHotel.AddRoom(accommodation.AccommodationID(order.RoomID))
 			}
 
-			g.AddGuestHouse(&hotel)
+			g.AddHotel(&testHotel)
 
-			q := newMemoryBookQueue(g, lg, 2)
+			q := newInMemoryBookingQueue(g, lg, 2)
 
 			var results []chan error
 
@@ -167,16 +169,16 @@ func TestBookOneRoom(t *testing.T) {
 					continue
 				}
 
-				assert.EqualError(t, err, "room with id=room1 has already been reserved")
+				assert.EqualError(t, err, "accommodation with id=room1 has already been reserved")
 			}
 
 			assert.True(t, flag)
 
 			_ = q.Stop()
 
-			assert.Equal(t, 1, len(hotel.Rooms))
-			for _, room := range hotel.Rooms {
-				assert.Equal(t, room.FreeRoomIntervals, []guest_house.RoomInterval{
+			assert.Equal(t, 1, len(testHotel.Rooms))
+			for _, room := range testHotel.Rooms {
+				assert.Equal(t, room.FreeRoomIntervals, []accommodation.IntervalAccommodation{
 					{
 						From: utils.Date(2030, 1, 1),
 						To:   utils.Date(2030, 4, 11),
