@@ -1,7 +1,7 @@
-package renter
+package rental
 
 import (
-	"applicationDesign/internal/logic/renter/accommodation"
+	"applicationDesign/internal/logic/rental/accommodation"
 	"errors"
 	"fmt"
 	"github.com/rs/zerolog"
@@ -9,20 +9,24 @@ import (
 )
 
 type Hotel struct {
-	RenterID   TRenterID
+	RenterID   TRentalID
 	Rooms      map[accommodation.TAccommodationID]*accommodation.HotelRoom
 	roomsMutex sync.RWMutex
 	lg         zerolog.Logger
 }
 
-var _ TBaseRenter = &Hotel{}
+var _ TBaseRental = &Hotel{}
 
-func NewHotel(renterID TRenterID, lg zerolog.Logger) Hotel {
+func NewHotel(renterID TRentalID, lg zerolog.Logger) Hotel {
 	return Hotel{
 		RenterID: renterID,
 		Rooms:    map[accommodation.TAccommodationID]*accommodation.HotelRoom{},
 		lg:       lg,
 	}
+}
+
+func (h *Hotel) GetRentalID() TRentalID {
+	return h.RenterID
 }
 
 func (h *Hotel) AddAccommodation(roomID accommodation.TAccommodationID) {
@@ -41,7 +45,7 @@ func (h *Hotel) ReserveAccommodation(roomID accommodation.TAccommodationID, inte
 		return errors.New("accommodation is not exists")
 	}
 
-	h.lg.Info().Str("room_id", string(roomID)).Any("rooms", h.Rooms).Msg("Status all rooms in renter")
+	h.lg.Info().Str("room_id", string(roomID)).Any("rooms", h.Rooms).Msg("Status all rooms in rental")
 
 	if !h.Rooms[roomID].ReserveByInterval(interval) {
 		return fmt.Errorf("accommodation with id=%v has already been reserved", roomID)

@@ -2,7 +2,7 @@ package provider
 
 import (
 	"applicationDesign/internal/config"
-	"applicationDesign/internal/logic/renter/manager"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"context"
 	"fmt"
@@ -15,7 +15,7 @@ type Provider interface {
 	Orders(ctx context.Context, order *models.Order) error
 }
 
-func NewProvider(guestHouseManager manager.BaseRentersManager, cfg config.ServiceConfig, lg zerolog.Logger) (Provider, error) {
+func NewProvider(guestHouseManager rental_manager.BaseRentalManager, cfg config.ServiceConfig, lg zerolog.Logger) (Provider, error) {
 	if cfg.IsMemoryStorage() {
 		lg.Info().Msg("create db provider")
 		return newMemoryProvider(guestHouseManager, lg, cfg)

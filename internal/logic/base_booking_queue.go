@@ -1,9 +1,9 @@
 package logic
 
-import "applicationDesign/internal/logic/renter"
+import "applicationDesign/internal/logic/rental"
 
 type BaseBookingQueue interface {
-	Add(order renter.HotelOrder) error
+	Add(order rental.HotelOrder) error
 	Stop() error
 	Worker()
 }

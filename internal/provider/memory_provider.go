@@ -3,7 +3,7 @@ package provider
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/logic"
-	"applicationDesign/internal/logic/renter/manager"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"context"
 
@@ -18,7 +18,7 @@ type MemoryProvider struct {
 
 var _ Provider = &MemoryProvider{}
 
-func newMemoryProvider(guestHouseManager manager.BaseRentersManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
+func newMemoryProvider(guestHouseManager rental_manager.BaseRentalManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
 	storage := &MemoryProvider{
 		bookingManager: logic.NewBookingManager(guestHouseManager, cfg.Workers, lg),
 		lg:             lg.With().Caller().Logger(),

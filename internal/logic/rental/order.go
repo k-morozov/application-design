@@ -1,4 +1,4 @@
-package renter
+package rental
 
 import (
 	"applicationDesign/internal/models"

@@ -3,7 +3,7 @@ package service
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/handlers"
-	"applicationDesign/internal/logic/renter/manager"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/provider"
 	"errors"
 	"net/http"
@@ -34,7 +34,7 @@ func NewServiceHTTP(cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*Servi
 		opt(srv)
 	}
 
-	guestHouseManager := manager.NewGuestHouseManager(srv.log)
+	guestHouseManager := rental_manager.NewGuestHouseManager(srv.log)
 	serviceProvider, err := provider.NewProvider(guestHouseManager, srv.config, srv.log)
 	if err != nil {
 		srv.log.Err(err).Msg("failed create provider")

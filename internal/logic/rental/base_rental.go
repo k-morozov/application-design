@@ -1,14 +1,15 @@
-package renter
+package rental
 
-import "applicationDesign/internal/logic/renter/accommodation"
+import "applicationDesign/internal/logic/rental/accommodation"
 
-type TRenterID string
+type TRentalID string
 
-func (id TRenterID) String() string {
+func (id TRentalID) String() string {
 	return string(id)
 }
 
-type TBaseRenter interface {
+type TBaseRental interface {
+	GetRentalID() TRentalID
 	AddAccommodation(accommodationID accommodation.TAccommodationID)
 	ReserveAccommodation(accommodationID accommodation.TAccommodationID, interval accommodation.TIntervalAccommodation) error
 }

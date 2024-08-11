@@ -1,9 +1,9 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/renter"
-	"applicationDesign/internal/logic/renter/accommodation"
-	"applicationDesign/internal/logic/renter/manager"
+	"applicationDesign/internal/logic/rental"
+	"applicationDesign/internal/logic/rental/accommodation"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"applicationDesign/internal/utils"
 	"github.com/rs/zerolog"
@@ -15,7 +15,7 @@ func TestSimpleBook(t *testing.T) {
 	lg := zerolog.Nop()
 	//lg := log.NewLogger("debug")
 
-	HotelID := renter.TRenterID("hotel1")
+	HotelID := rental.TRentalID("hotel1")
 	tests := []struct {
 		name   string
 		orders []models.Order
@@ -57,14 +57,14 @@ func TestSimpleBook(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := manager.NewGuestHouseManager(lg)
+			g := rental_manager.NewGuestHouseManager(lg)
 
-			testHotel := renter.NewHotel(HotelID, lg)
+			testHotel := rental.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
 				testHotel.AddAccommodation(accommodation.TAccommodationID(order.RoomID))
 			}
 
-			g.AddHotel(&testHotel)
+			g.AddLandlord(&testHotel)
 
 			q := NewInMemoryBookingQueue(g, lg, 2)
 
@@ -111,7 +111,7 @@ func TestBookOneRoom(t *testing.T) {
 	lg := zerolog.Nop()
 	//lg := log.NewLogger("debug")
 
-	HotelID := renter.TRenterID("hotel1")
+	HotelID := rental.TRentalID("hotel1")
 	tests := []struct {
 		name   string
 		orders []models.Order
@@ -139,14 +139,14 @@ func TestBookOneRoom(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := manager.NewGuestHouseManager(lg)
+			g := rental_manager.NewGuestHouseManager(lg)
 
-			testHotel := renter.NewHotel(HotelID, lg)
+			testHotel := rental.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
 				testHotel.AddAccommodation(accommodation.TAccommodationID(order.RoomID))
 			}
 
-			g.AddHotel(&testHotel)
+			g.AddLandlord(&testHotel)
 
 			q := NewInMemoryBookingQueue(g, lg, 2)
 
