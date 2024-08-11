@@ -4,12 +4,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type BookingID uuid.UUID
+type TBookingID uuid.UUID
 
-func (id BookingID) String() string {
+func (id TBookingID) String() string {
 	return uuid.UUID(id).String()
 }
 
-func NewBookingID() BookingID {
-	return BookingID(uuid.New())
+func NewBookingID() TBookingID {
+	return TBookingID(uuid.New())
 }

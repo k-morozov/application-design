@@ -3,7 +3,7 @@ package provider
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/logic"
-	"applicationDesign/internal/logic/hotel/manager"
+	"applicationDesign/internal/logic/renter/manager"
 	"applicationDesign/internal/models"
 	"context"
 
@@ -18,7 +18,7 @@ type MemoryProvider struct {
 
 var _ Provider = &MemoryProvider{}
 
-func newMemoryProvider(guestHouseManager manager.BaseHotelManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
+func newMemoryProvider(guestHouseManager manager.BaseRentersManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
 	storage := &MemoryProvider{
 		bookingManager: logic.NewBookingManager(guestHouseManager, cfg.Workers, lg),
 		lg:             lg.With().Caller().Logger(),
@@ -35,7 +35,7 @@ func (s *MemoryProvider) Ping() error {
 }
 
 func (s *MemoryProvider) Orders(ctx context.Context, order *models.Order) error {
-	var bookingId logic.BookingID
+	var bookingId logic.TBookingID
 	var err error
 
 	s.lg.Info().Msg("MemoryProvider: call Orders")

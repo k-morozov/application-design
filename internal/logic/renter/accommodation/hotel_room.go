@@ -6,27 +6,27 @@ import (
 )
 
 type HotelRoom struct {
-	RoomID                AccommodationID
-	FreeRoomIntervals     []IntervalAccommodation
-	ReservedRoomIntervals []IntervalAccommodation
+	RoomID                TAccommodationID
+	FreeRoomIntervals     []TIntervalAccommodation
+	ReservedRoomIntervals []TIntervalAccommodation
 }
 
 var _ BaseAccommodation = &HotelRoom{}
 
-func NewRoom(roomID AccommodationID) HotelRoom {
+func NewRoom(roomID TAccommodationID) HotelRoom {
 	return HotelRoom{
 		RoomID: roomID,
-		FreeRoomIntervals: []IntervalAccommodation{
+		FreeRoomIntervals: []TIntervalAccommodation{
 			{
 				From: utils.DefaultFromDateHotelAvailable,
 				To:   utils.DefaultToDateHotelAvailable,
 			},
 		},
-		ReservedRoomIntervals: []IntervalAccommodation{},
+		ReservedRoomIntervals: []TIntervalAccommodation{},
 	}
 }
 
-func (r *HotelRoom) ReserveByInterval(candidateInterval IntervalAccommodation) bool {
+func (r *HotelRoom) ReserveByInterval(candidateInterval TIntervalAccommodation) bool {
 	for index, interval := range r.FreeRoomIntervals {
 		// early break
 
@@ -60,13 +60,13 @@ func (r *HotelRoom) ReserveByInterval(candidateInterval IntervalAccommodation) b
 			if splitInterval {
 				r.FreeRoomIntervals[index].To = candidateInterval.From
 
-				r.FreeRoomIntervals = append(r.FreeRoomIntervals, IntervalAccommodation{
+				r.FreeRoomIntervals = append(r.FreeRoomIntervals, TIntervalAccommodation{
 					From: candidateInterval.To,
 					To:   oldTo,
 				})
 			}
 
-			r.ReservedRoomIntervals = append(r.ReservedRoomIntervals, IntervalAccommodation{
+			r.ReservedRoomIntervals = append(r.ReservedRoomIntervals, TIntervalAccommodation{
 				From: candidateInterval.From,
 				To:   candidateInterval.To,
 			})

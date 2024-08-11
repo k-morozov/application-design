@@ -1,4 +1,4 @@
-package hotel
+package renter
 
 import (
 	"applicationDesign/internal/models"

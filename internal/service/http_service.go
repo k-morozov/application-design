@@ -3,7 +3,7 @@ package service
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/handlers"
-	"applicationDesign/internal/logic/hotel/manager"
+	"applicationDesign/internal/logic/renter/manager"
 	"applicationDesign/internal/provider"
 	"errors"
 	"net/http"

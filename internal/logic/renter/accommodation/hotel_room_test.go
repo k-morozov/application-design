@@ -13,20 +13,20 @@ func TestRoomIntervals(t *testing.T) {
 	tests := []struct {
 		name                      string
 		room                      HotelRoom
-		intervals                 []IntervalAccommodation
-		expectedFreeIntervals     []IntervalAccommodation
-		expectedReservedIntervals []IntervalAccommodation
+		intervals                 []TIntervalAccommodation
+		expectedFreeIntervals     []TIntervalAccommodation
+		expectedReservedIntervals []TIntervalAccommodation
 	}{
 		{
 			name: "reserve one day",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 2),
 					To:   utils.Date(2030, 1, 3),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 1, 2),
@@ -36,7 +36,7 @@ func TestRoomIntervals(t *testing.T) {
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 2),
 					To:   utils.Date(2030, 1, 3),
@@ -46,7 +46,7 @@ func TestRoomIntervals(t *testing.T) {
 		{
 			name: "reserve 2 times",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 2),
 					To:   utils.Date(2030, 1, 15),
@@ -56,7 +56,7 @@ func TestRoomIntervals(t *testing.T) {
 					To:   utils.Date(2030, 2, 2),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 1, 2),
@@ -70,7 +70,7 @@ func TestRoomIntervals(t *testing.T) {
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 2),
 					To:   utils.Date(2030, 1, 15),
@@ -84,19 +84,19 @@ func TestRoomIntervals(t *testing.T) {
 		{
 			name: "reserve from begin",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 1, 3),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 3),
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 1, 3),
@@ -106,7 +106,7 @@ func TestRoomIntervals(t *testing.T) {
 		{
 			name: "reserve from begin many",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 3),
 					To:   utils.Date(2030, 1, 10),
@@ -116,13 +116,13 @@ func TestRoomIntervals(t *testing.T) {
 					To:   utils.Date(2030, 1, 3),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 10),
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 1, 3),
@@ -136,19 +136,19 @@ func TestRoomIntervals(t *testing.T) {
 		{
 			name: "reserve to end",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 12, 1),
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 12, 1),
 				},
 			},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 12, 1),
 					To:   utils.Date(2030, 12, 31),
@@ -158,14 +158,14 @@ func TestRoomIntervals(t *testing.T) {
 		{
 			name: "reserve all",
 			room: NewRoom("room1"),
-			intervals: []IntervalAccommodation{
+			intervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 12, 31),
 				},
 			},
-			expectedFreeIntervals: []IntervalAccommodation{},
-			expectedReservedIntervals: []IntervalAccommodation{
+			expectedFreeIntervals: []TIntervalAccommodation{},
+			expectedReservedIntervals: []TIntervalAccommodation{
 				{
 					From: utils.Date(2030, 1, 1),
 					To:   utils.Date(2030, 12, 31),

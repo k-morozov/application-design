@@ -1,26 +1,26 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/hotel"
-	"applicationDesign/internal/logic/hotel/manager"
+	"applicationDesign/internal/logic/renter"
+	"applicationDesign/internal/logic/renter/manager"
 	"github.com/rs/zerolog"
 	"sync"
 )
 
 type InMemoryBookingQueue struct {
-	guestHouseManager manager.BaseHotelManager
+	guestHouseManager manager.BaseRentersManager
 	lg                zerolog.Logger
-	ordersQueue       chan hotel.HotelOrder
+	ordersQueue       chan renter.HotelOrder
 	wg                sync.WaitGroup
 }
 
 var _ BaseBookingQueue = &InMemoryBookingQueue{}
 
-func newInMemoryBookingQueue(guestHouseManager manager.BaseHotelManager, lg zerolog.Logger, workers int) BaseBookingQueue {
+func NewInMemoryBookingQueue(guestHouseManager manager.BaseRentersManager, lg zerolog.Logger, workers int) BaseBookingQueue {
 	result := &InMemoryBookingQueue{
 		guestHouseManager: guestHouseManager,
 		lg:                lg,
-		ordersQueue:       make(chan hotel.HotelOrder),
+		ordersQueue:       make(chan renter.HotelOrder),
 	}
 	for w := 0; w < workers; w++ {
 		result.lg.Debug().Msg("Add worker queue")
@@ -30,7 +30,7 @@ func newInMemoryBookingQueue(guestHouseManager manager.BaseHotelManager, lg zero
 	return result
 }
 
-func (q *InMemoryBookingQueue) Add(order hotel.HotelOrder) error {
+func (q *InMemoryBookingQueue) Add(order renter.HotelOrder) error {
 	q.lg.Info().Any("order", order.Order).Msg("add order to booking queue")
 
 	// @todo if channel is close?
