@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +18,7 @@ func TestSimpleServiceWork(t *testing.T) {
 	// s, _ := NewServiceHTTP(lg, config.NewServiceConfigForDebug(),
 	// 	OptLogger(lg))
 
-	s, _ := NewServiceHTTP(zerolog.Nop(), config.NewServiceConfigForDebug())
+	s, _ := NewServiceHTTP(config.NewServiceConfigForDebug())
 
 	tests := []struct {
 		name     string

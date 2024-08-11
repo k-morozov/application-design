@@ -16,7 +16,7 @@ func Run() {
 		Any("cfg", cfg).
 		Msg("get config")
 
-	srv, err := service.NewServiceHTTP(lg, cfg,
+	srv, err := service.NewServiceHTTP(cfg,
 		service.OptLogger(lg))
 
 	if err != nil {

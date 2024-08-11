@@ -3,6 +3,7 @@ package logic
 import (
 	"applicationDesign/internal/logic/guest_house"
 	"applicationDesign/internal/models"
+	"applicationDesign/internal/utils"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -24,29 +25,29 @@ func TestSimpleBook(t *testing.T) {
 					HotelID:   HotelID.String(),
 					RoomID:    "room1",
 					UserEmail: "a@a",
-					From:      guest_house.Date(2030, 1, 11),
-					To:        guest_house.Date(2030, 1, 21),
+					From:      utils.Date(2030, 1, 11),
+					To:        utils.Date(2030, 1, 21),
 				},
 				{
 					HotelID:   HotelID.String(),
 					RoomID:    "room2",
 					UserEmail: "b@b",
-					From:      guest_house.Date(2030, 2, 11),
-					To:        guest_house.Date(2030, 2, 21),
+					From:      utils.Date(2030, 1, 11),
+					To:        utils.Date(2030, 1, 21),
 				},
 				{
 					HotelID:   HotelID.String(),
 					RoomID:    "room3",
 					UserEmail: "c@c",
-					From:      guest_house.Date(2030, 3, 11),
-					To:        guest_house.Date(2030, 3, 21),
+					From:      utils.Date(2030, 1, 11),
+					To:        utils.Date(2030, 1, 21),
 				},
 				{
 					HotelID:   HotelID.String(),
 					RoomID:    "room4",
 					UserEmail: "a@a",
-					From:      guest_house.Date(2030, 4, 11),
-					To:        guest_house.Date(2030, 4, 21),
+					From:      utils.Date(2030, 1, 11),
+					To:        utils.Date(2030, 1, 21),
 				},
 			},
 		},
@@ -85,10 +86,20 @@ func TestSimpleBook(t *testing.T) {
 
 			assert.Equal(t, len(test.orders), len(hotel.Rooms))
 			for _, order := range test.orders {
-				_, ok := hotel.Rooms[guest_house.RoomID(order.RoomID)]
+				room, ok := hotel.Rooms[guest_house.RoomID(order.RoomID)]
 
 				assert.True(t, ok)
-				//assert.Equal(t, room.Status, guest_house.RoomReserve)
+
+				assert.Equal(t, room.FreeRoomIntervals, []guest_house.RoomInterval{
+					{
+						From: utils.Date(2030, 1, 1),
+						To:   utils.Date(2030, 1, 11),
+					},
+					{
+						From: utils.Date(2030, 1, 21),
+						To:   utils.Date(2030, 12, 31),
+					},
+				})
 			}
 		})
 	}
@@ -110,15 +121,15 @@ func TestBookOneRoom(t *testing.T) {
 					HotelID:   HotelID.String(),
 					RoomID:    "room1",
 					UserEmail: "a@a",
-					From:      guest_house.Date(2030, 4, 11),
-					To:        guest_house.Date(2030, 4, 21),
+					From:      utils.Date(2030, 4, 11),
+					To:        utils.Date(2030, 4, 21),
 				},
 				{
 					HotelID:   HotelID.String(),
 					RoomID:    "room1",
 					UserEmail: "b@b",
-					From:      guest_house.Date(2030, 4, 11),
-					To:        guest_house.Date(2030, 4, 21),
+					From:      utils.Date(2030, 4, 11),
+					To:        utils.Date(2030, 4, 21),
 				},
 			},
 		},
@@ -164,9 +175,18 @@ func TestBookOneRoom(t *testing.T) {
 			_ = q.Stop()
 
 			assert.Equal(t, 1, len(hotel.Rooms))
-			//for _, room := range hotel.Rooms {
-			//	assert.Equal(t, room.Status, guest_house.RoomReserve)
-			//}
+			for _, room := range hotel.Rooms {
+				assert.Equal(t, room.FreeRoomIntervals, []guest_house.RoomInterval{
+					{
+						From: utils.Date(2030, 1, 1),
+						To:   utils.Date(2030, 4, 11),
+					},
+					{
+						From: utils.Date(2030, 4, 21),
+						To:   utils.Date(2030, 12, 31),
+					},
+				})
+			}
 		})
 	}
 }

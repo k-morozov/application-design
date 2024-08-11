@@ -23,24 +23,24 @@ type (
 	}
 )
 
-func NewServiceHTTP(lg zerolog.Logger, cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
-	guestHouseManager := guest_house.NewGuestHouseManager(lg)
-
-	store, err := storage.NewStorage(guestHouseManager, cfg, lg)
-	if err != nil {
-		lg.Err(err).Msg("failed create store")
-		return nil, err
-	}
-
+func NewServiceHTTP(cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
 	srv := &ServiceHTTP{
 		engine: chi.NewRouter(),
-		store:  store,
 		config: cfg,
 	}
 
 	for _, opt := range opts {
 		opt(srv)
 	}
+
+	guestHouseManager := guest_house.NewGuestHouseManager(srv.log)
+	store, err := storage.NewStorage(guestHouseManager, srv.config, srv.log)
+	if err != nil {
+		srv.log.Err(err).Msg("failed create store")
+		return nil, err
+	}
+
+	srv.store = store
 
 	return srv, nil
 }
