@@ -3,6 +3,7 @@ package app
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/log"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/service"
 	"errors"
 	"net/http"
@@ -16,7 +17,8 @@ func Run() {
 		Any("cfg", cfg).
 		Msg("get config")
 
-	srv, err := service.NewServiceHTTP(lg, cfg,
+	rentalManager := rental_manager.NewHotelManager(lg)
+	srv, err := service.NewServiceHTTP(rentalManager, cfg,
 		service.OptLogger(lg))
 
 	if err != nil {

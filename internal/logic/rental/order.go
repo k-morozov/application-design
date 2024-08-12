@@ -1,4 +1,4 @@
-package guest_house
+package rental
 
 import (
 	"applicationDesign/internal/models"

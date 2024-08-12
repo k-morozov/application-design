@@ -1,25 +1,26 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/logic/rental"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"github.com/rs/zerolog"
 	"sync"
 )
 
-type WorkerBookQueue struct {
-	guestHouseManager guest_house.GuestHouseManager
+type InMemoryBookingQueue struct {
+	guestHouseManager rental_manager.BaseRentalManager
 	lg                zerolog.Logger
-	ordersQueue       chan guest_house.HotelOrder
+	ordersQueue       chan rental.HotelOrder
 	wg                sync.WaitGroup
 }
 
-var _ BookQueue = &WorkerBookQueue{}
+var _ BaseBookingQueue = &InMemoryBookingQueue{}
 
-func newMemoryBookQueue(guestHouseManager guest_house.GuestHouseManager, lg zerolog.Logger, workers int) BookQueue {
-	result := &WorkerBookQueue{
+func NewInMemoryBookingQueue(guestHouseManager rental_manager.BaseRentalManager, lg zerolog.Logger, workers int) BaseBookingQueue {
+	result := &InMemoryBookingQueue{
 		guestHouseManager: guestHouseManager,
 		lg:                lg,
-		ordersQueue:       make(chan guest_house.HotelOrder),
+		ordersQueue:       make(chan rental.HotelOrder),
 	}
 	for w := 0; w < workers; w++ {
 		result.lg.Debug().Msg("Add worker queue")
@@ -29,7 +30,7 @@ func newMemoryBookQueue(guestHouseManager guest_house.GuestHouseManager, lg zero
 	return result
 }
 
-func (q *WorkerBookQueue) Add(order guest_house.HotelOrder) error {
+func (q *InMemoryBookingQueue) Add(order rental.HotelOrder) error {
 	q.lg.Info().Any("order", order.Order).Msg("add order to booking queue")
 
 	// @todo if channel is close?
@@ -37,7 +38,7 @@ func (q *WorkerBookQueue) Add(order guest_house.HotelOrder) error {
 	return nil
 }
 
-func (q *WorkerBookQueue) Stop() error {
+func (q *InMemoryBookingQueue) Stop() error {
 	q.lg.Debug().Msg("Stop queue")
 	close(q.ordersQueue)
 
@@ -47,7 +48,7 @@ func (q *WorkerBookQueue) Stop() error {
 	return nil
 }
 
-func (q *WorkerBookQueue) Worker() {
+func (q *InMemoryBookingQueue) Worker() {
 	for order := range q.ordersQueue {
 		//q.lg.Debug().Any("order", order.Order).Msg("worker gets order from booking queue.")
 

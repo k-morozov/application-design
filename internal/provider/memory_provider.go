@@ -1,44 +1,44 @@
-package storage
+package provider
 
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/logic"
-	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"context"
 
 	"github.com/rs/zerolog"
 )
 
-type MemoryStorage struct {
-	bookingManager logic.Manager
+type MemoryProvider struct {
+	bookingManager logic.BaseBookingManager
 	lg             zerolog.Logger
 	cfg            config.ServiceConfig
 }
 
-var _ Storage = &MemoryStorage{}
+var _ Provider = &MemoryProvider{}
 
-func newMemoryStorage(guestHouseManager guest_house.GuestHouseManager, lg zerolog.Logger, cfg config.ServiceConfig) (Storage, error) {
-	storage := &MemoryStorage{
+func newMemoryProvider(guestHouseManager rental_manager.BaseRentalManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
+	storage := &MemoryProvider{
 		bookingManager: logic.NewBookingManager(guestHouseManager, cfg.Workers, lg),
 		lg:             lg.With().Caller().Logger(),
 		cfg:            cfg,
 	}
 
-	storage.lg.Info().Msg("Memory storage created")
+	storage.lg.Info().Msg("Memory provider created")
 
 	return storage, nil
 }
 
-func (s *MemoryStorage) Ping() error {
+func (s *MemoryProvider) Ping() error {
 	return nil
 }
 
-func (s *MemoryStorage) Orders(ctx context.Context, order *models.Order) error {
-	var bookingId logic.BookingID
+func (s *MemoryProvider) Orders(ctx context.Context, order *models.Order) error {
+	var bookingId logic.TBookingID
 	var err error
 
-	s.lg.Info().Msg("MemoryStorage: call Orders")
+	s.lg.Info().Msg("MemoryProvider: call Orders")
 
 	if bookingId, err = s.bookingManager.PrepareBook(*order); err != nil {
 		s.lg.Error().Msg("failed prepared booking")

@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"applicationDesign/internal/logic/guest_house"
+	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"github.com/rs/zerolog"
 	"sync"
@@ -9,55 +9,55 @@ import (
 
 type BookingManager struct {
 	lg          zerolog.Logger
-	bookQueue   BookQueue
+	bookQueue   BaseBookingQueue
 	ordersMutex sync.Mutex
-	orders      map[BookingID]models.Order
+	orders      map[TBookingID]models.Order
 }
 
-var _ Manager = &BookingManager{}
+var _ BaseBookingManager = &BookingManager{}
 
-func NewBookingManager(guestHouseManager guest_house.GuestHouseManager, workers int, lg zerolog.Logger) Manager {
+func NewBookingManager(rentalManager rental_manager.BaseRentalManager, workers int, lg zerolog.Logger) BaseBookingManager {
 	p := &BookingManager{
 		lg:        lg.With().Caller().Logger(),
-		bookQueue: newMemoryBookQueue(guestHouseManager, lg, workers),
-		orders:    make(map[BookingID]models.Order),
+		bookQueue: NewInMemoryBookingQueue(rentalManager, lg, workers),
+		orders:    make(map[TBookingID]models.Order),
 	}
 
 	return p
 }
 
-func (m *BookingManager) PrepareBook(order models.Order) (BookingID, error) {
+func (m *BookingManager) PrepareBook(order models.Order) (TBookingID, error) {
 	m.lg.Info().Msg("BookingManager: call PrepareBook")
 
 	internalOrder := transform(order)
 	orderDescriptorCh := internalOrder.ResultCh
 	if err := m.bookQueue.Add(internalOrder); err != nil {
 		m.lg.Error().Err(err).Msg("Failed add")
-		return BookingID{}, err
+		return TBookingID{}, err
 	}
 
 	m.lg.Info().Msg("BookingManager: wait resultCh")
 	err := <-orderDescriptorCh
 	if err != nil {
 		m.lg.Error().Err(err).Msg("Failed prepare book")
-		return BookingID{}, err
+		return TBookingID{}, err
 	}
 
 	bookingID, err := m.SaveOrder(order)
 	if err != nil {
 		m.lg.Error().Err(err).Msg("Failed save order")
-		return BookingID{}, err
+		return TBookingID{}, err
 	}
 
 	m.lg.Info().Any("book_id", bookingID).Msg("BookingManager: PrepareBook finished")
 	return bookingID, nil
 }
 
-func (m *BookingManager) AcceptBook(bookingID BookingID) error {
+func (m *BookingManager) AcceptBook(bookingID TBookingID) error {
 	return nil
 }
 
-func (m *BookingManager) SaveOrder(order models.Order) (BookingID, error) {
+func (m *BookingManager) SaveOrder(order models.Order) (TBookingID, error) {
 	bookingID := NewBookingID()
 	m.ordersMutex.Lock()
 	defer m.ordersMutex.Unlock()

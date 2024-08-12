@@ -81,8 +81,8 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(unavailableDays) != 0 {
-		http.Error(w, "Hotel room is not available for selected dates", http.StatusInternalServerError)
-		LogErrorf("Hotel room is not available for selected dates:\n%v\n%v", newOrder, unavailableDays)
+		http.Error(w, "Hotel accommodation is not available for selected dates", http.StatusInternalServerError)
+		LogErrorf("Hotel accommodation is not available for selected dates:\n%v\n%v", newOrder, unavailableDays)
 		return
 	}
 
