@@ -24,7 +24,7 @@ type (
 	}
 )
 
-func NewServiceHTTP(cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
+func NewServiceHTTP(rentalManager rental_manager.BaseRentalManager, cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*ServiceHTTP, error) {
 	srv := &ServiceHTTP{
 		engine: chi.NewRouter(),
 		config: cfg,
@@ -34,8 +34,7 @@ func NewServiceHTTP(cfg config.ServiceConfig, opts ...ServiceHTTPOption) (*Servi
 		opt(srv)
 	}
 
-	guestHouseManager := rental_manager.NewGuestHouseManager(srv.log)
-	serviceProvider, err := provider.NewProvider(guestHouseManager, srv.config, srv.log)
+	serviceProvider, err := provider.NewProvider(rentalManager, srv.config, srv.log)
 	if err != nil {
 		srv.log.Err(err).Msg("failed create provider")
 		return nil, err

@@ -12,5 +12,7 @@ type TIntervalAccommodation struct {
 }
 
 type BaseAccommodation interface {
+	GetFreeIntervals() []TIntervalAccommodation
+	GetReservedIntervals() []TIntervalAccommodation
 	ReserveByInterval(candidateInterval TIntervalAccommodation) bool
 }

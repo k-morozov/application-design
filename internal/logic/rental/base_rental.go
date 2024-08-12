@@ -10,6 +10,7 @@ func (id TRentalID) String() string {
 
 type TBaseRental interface {
 	GetRentalID() TRentalID
+	GetTableAccommodation() map[accommodation.TAccommodationID]accommodation.BaseAccommodation
 	AddAccommodation(accommodationID accommodation.TAccommodationID)
 	ReserveAccommodation(accommodationID accommodation.TAccommodationID, interval accommodation.TIntervalAccommodation) error
 }

@@ -6,6 +6,6 @@ import (
 )
 
 type BaseRentalManager interface {
-	AddLandlord(renter rental.TBaseRental)
+	AddRental(renter rental.TBaseRental)
 	PrepareBook(order models.Order) error
 }

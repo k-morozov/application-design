@@ -57,14 +57,14 @@ func TestSimpleBook(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := rental_manager.NewGuestHouseManager(lg)
+			g := rental_manager.NewHotelManager(lg)
 
 			testHotel := rental.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
 				testHotel.AddAccommodation(accommodation.TAccommodationID(order.RoomID))
 			}
 
-			g.AddLandlord(&testHotel)
+			g.AddRental(testHotel)
 
 			q := NewInMemoryBookingQueue(g, lg, 2)
 
@@ -86,13 +86,14 @@ func TestSimpleBook(t *testing.T) {
 
 			_ = q.Stop()
 
-			assert.Equal(t, len(test.orders), len(testHotel.Rooms))
+			rooms := testHotel.GetTableAccommodation()
+			assert.Equal(t, len(test.orders), len(rooms))
 			for _, order := range test.orders {
-				room, ok := testHotel.Rooms[accommodation.TAccommodationID(order.RoomID)]
+				room, ok := rooms[accommodation.TAccommodationID(order.RoomID)]
 
 				assert.True(t, ok)
 
-				assert.Equal(t, room.FreeRoomIntervals, []accommodation.TIntervalAccommodation{
+				assert.Equal(t, room.GetFreeIntervals(), []accommodation.TIntervalAccommodation{
 					{
 						From: utils.Date(2030, 1, 1),
 						To:   utils.Date(2030, 1, 11),
@@ -139,14 +140,14 @@ func TestBookOneRoom(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			g := rental_manager.NewGuestHouseManager(lg)
+			g := rental_manager.NewHotelManager(lg)
 
 			testHotel := rental.NewHotel(HotelID, lg)
 			for _, order := range test.orders {
 				testHotel.AddAccommodation(accommodation.TAccommodationID(order.RoomID))
 			}
 
-			g.AddLandlord(&testHotel)
+			g.AddRental(testHotel)
 
 			q := NewInMemoryBookingQueue(g, lg, 2)
 
@@ -176,9 +177,10 @@ func TestBookOneRoom(t *testing.T) {
 
 			_ = q.Stop()
 
-			assert.Equal(t, 1, len(testHotel.Rooms))
-			for _, room := range testHotel.Rooms {
-				assert.Equal(t, room.FreeRoomIntervals, []accommodation.TIntervalAccommodation{
+			rooms := testHotel.GetTableAccommodation()
+			assert.Equal(t, 1, len(rooms))
+			for _, room := range rooms {
+				assert.Equal(t, room.GetFreeIntervals(), []accommodation.TIntervalAccommodation{
 					{
 						From: utils.Date(2030, 1, 1),
 						To:   utils.Date(2030, 4, 11),

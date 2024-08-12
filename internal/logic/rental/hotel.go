@@ -10,17 +10,17 @@ import (
 
 type Hotel struct {
 	RenterID   TRentalID
-	Rooms      map[accommodation.TAccommodationID]*accommodation.HotelRoom
+	Rooms      map[accommodation.TAccommodationID]accommodation.BaseAccommodation
 	roomsMutex sync.RWMutex
 	lg         zerolog.Logger
 }
 
 var _ TBaseRental = &Hotel{}
 
-func NewHotel(renterID TRentalID, lg zerolog.Logger) Hotel {
-	return Hotel{
+func NewHotel(renterID TRentalID, lg zerolog.Logger) TBaseRental {
+	return &Hotel{
 		RenterID: renterID,
-		Rooms:    map[accommodation.TAccommodationID]*accommodation.HotelRoom{},
+		Rooms:    map[accommodation.TAccommodationID]accommodation.BaseAccommodation{},
 		lg:       lg,
 	}
 }
@@ -29,12 +29,16 @@ func (h *Hotel) GetRentalID() TRentalID {
 	return h.RenterID
 }
 
+func (h *Hotel) GetTableAccommodation() map[accommodation.TAccommodationID]accommodation.BaseAccommodation {
+	return h.Rooms
+}
+
 func (h *Hotel) AddAccommodation(roomID accommodation.TAccommodationID) {
 	h.roomsMutex.Lock()
 	defer h.roomsMutex.Unlock()
 
 	r := accommodation.NewRoom(roomID)
-	h.Rooms[roomID] = &r
+	h.Rooms[roomID] = r
 }
 
 func (h *Hotel) ReserveAccommodation(roomID accommodation.TAccommodationID, interval accommodation.TIntervalAccommodation) error {

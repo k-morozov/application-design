@@ -17,14 +17,14 @@ type HotelManager struct {
 
 var _ BaseRentalManager = &HotelManager{}
 
-func NewGuestHouseManager(lg zerolog.Logger) BaseRentalManager {
+func NewHotelManager(lg zerolog.Logger) BaseRentalManager {
 	return &HotelManager{
 		hotelsTable: make(map[rental.TRentalID]rental.TBaseRental),
 		lg:          lg,
 	}
 }
 
-func (h *HotelManager) AddLandlord(hotel rental.TBaseRental) {
+func (h *HotelManager) AddRental(hotel rental.TBaseRental) {
 	h.hotelsTableMutex.Lock()
 	defer h.hotelsTableMutex.Unlock()
 

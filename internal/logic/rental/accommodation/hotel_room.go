@@ -13,8 +13,8 @@ type HotelRoom struct {
 
 var _ BaseAccommodation = &HotelRoom{}
 
-func NewRoom(roomID TAccommodationID) HotelRoom {
-	return HotelRoom{
+func NewRoom(roomID TAccommodationID) BaseAccommodation {
+	return &HotelRoom{
 		RoomID: roomID,
 		FreeRoomIntervals: []TIntervalAccommodation{
 			{
@@ -26,9 +26,19 @@ func NewRoom(roomID TAccommodationID) HotelRoom {
 	}
 }
 
+func (r *HotelRoom) GetFreeIntervals() []TIntervalAccommodation {
+	return r.FreeRoomIntervals
+}
+
+func (r *HotelRoom) GetReservedIntervals() []TIntervalAccommodation {
+	return r.ReservedRoomIntervals
+}
+
 func (r *HotelRoom) ReserveByInterval(candidateInterval TIntervalAccommodation) bool {
 	for index, interval := range r.FreeRoomIntervals {
-		// early break
+		if candidateInterval.From.Before(interval.From) {
+			continue
+		}
 
 		resultFrom := interval.From.Compare(candidateInterval.From)
 		resultTo := interval.To.Compare(candidateInterval.To)
