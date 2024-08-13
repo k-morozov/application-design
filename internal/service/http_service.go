@@ -48,6 +48,7 @@ func NewServiceHTTP(rentalManager rental_manager.BaseRentalManager, cfg config.S
 func (s *ServiceHTTP) ListenAndServe() error {
 	s.engine.Get("/ping", s.Ping)
 	s.engine.Post("/orders", s.Orders)
+	s.engine.Post("/add_hotel", s.AddHotel)
 
 	log.Info().
 		Str("port", s.config.Port).
@@ -73,4 +74,8 @@ func (s *ServiceHTTP) Ping(rw http.ResponseWriter, req *http.Request) {
 
 func (s *ServiceHTTP) Orders(rw http.ResponseWriter, req *http.Request) {
 	handlers.Orders(rw, req, s.provider, s.config)
+}
+
+func (s *ServiceHTTP) AddHotel(rw http.ResponseWriter, req *http.Request) {
+	handlers.AddHotel(rw, req, s.provider, s.config)
 }

@@ -13,6 +13,7 @@ import (
 type Provider interface {
 	Ping() error
 	Orders(ctx context.Context, order *models.Order) error
+	AddHotel(ctx context.Context, hotel *models.AddHotel) error
 }
 
 func NewProvider(guestHouseManager rental_manager.BaseRentalManager, cfg config.ServiceConfig, lg zerolog.Logger) (Provider, error) {

@@ -17,4 +17,7 @@ test:
 test_race:
 	go test -race -v ./...
 
+test_integration:
+	pytest ./test/test_integration.py
+
 all: build
