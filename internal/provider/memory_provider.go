@@ -3,6 +3,8 @@ package provider
 import (
 	"applicationDesign/internal/config"
 	"applicationDesign/internal/logic"
+	"applicationDesign/internal/logic/rental"
+	"applicationDesign/internal/logic/rental/accommodation"
 	"applicationDesign/internal/logic/rental/rental_manager"
 	"applicationDesign/internal/models"
 	"context"
@@ -11,6 +13,10 @@ import (
 )
 
 type MemoryProvider struct {
+	// @todo workaround, good way to use booking manager
+	// for adding hotel.
+	rentalManager rental_manager.BaseRentalManager
+
 	bookingManager logic.BaseBookingManager
 	lg             zerolog.Logger
 	cfg            config.ServiceConfig
@@ -18,9 +24,10 @@ type MemoryProvider struct {
 
 var _ Provider = &MemoryProvider{}
 
-func newMemoryProvider(guestHouseManager rental_manager.BaseRentalManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
+func newMemoryProvider(rentalManager rental_manager.BaseRentalManager, lg zerolog.Logger, cfg config.ServiceConfig) (Provider, error) {
 	storage := &MemoryProvider{
-		bookingManager: logic.NewBookingManager(guestHouseManager, cfg.Workers, lg),
+		rentalManager:  rentalManager,
+		bookingManager: logic.NewBookingManager(rentalManager, cfg.Workers, lg),
 		lg:             lg.With().Caller().Logger(),
 		cfg:            cfg,
 	}
@@ -53,5 +60,18 @@ func (s *MemoryProvider) Orders(ctx context.Context, order *models.Order) error 
 	}
 
 	s.lg.Info().Str("booking_id", bookingId.String()).Msg("successfully booked")
+	return nil
+}
+
+func (s *MemoryProvider) AddHotel(ctx context.Context, hotel *models.AddHotel) error {
+	s.lg.Info().Msg("MemoryProvider: call AddHotel")
+
+	h := rental.NewHotel(rental.TRentalID(hotel.HotelID), s.lg)
+	for _, roomId := range hotel.RoomsID {
+		h.AddAccommodation(accommodation.TAccommodationID(roomId))
+	}
+
+	s.rentalManager.AddRental(h)
+
 	return nil
 }
